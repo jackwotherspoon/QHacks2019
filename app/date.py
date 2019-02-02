@@ -10,7 +10,7 @@ from google.auth.transport.requests import Request
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
-def main():
+def getInfo():
     """Shows basic usage of the Google Calendar API.
     Prints the start and name of the next 10 events on the user's calendar.
     """
@@ -27,7 +27,7 @@ def main():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+                'app.credentials.json', SCOPES)
             creds = flow.run_local_server()
         # Save the credentials for the next run
         with open('token.pickle', 'wb') as token:
@@ -37,28 +37,33 @@ def main():
 
     # Call the Calendar API
     now = datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-    print('Getting the upcoming 100 events')
+    print('Getting the upcoming 10 events')
     events_result = service.events().list(calendarId='primary', timeMin=now,
-                                        maxResults=4, singleEvents=True,
+                                        maxResults=10, singleEvents=True,
                                         orderBy='startTime').execute()
     events = events_result.get('items', [])
-
+    info=[]
     if not events:
         print('No upcoming events found.')
     for event in events:
+
         start = event['start'].get('dateTime', event['start'].get('date'))
+        end =event['end'].get('dateTime',event['end'].get('date'))
+
+        startTime=dateutil.parser.parse(start)
+        startTime=(startTime.time())
+
+        endTime=dateutil.parser.parse(end)
+        endTime=(endTime.time())
+
         datetime_object = dateutil.parser.parse(start)
-        #print(start, event['summary'])
-        #print(datetime_object)
-        #print(datetime_object.date())
-        dt=(datetime.today())
-        dateobj=dt.strftime("%Y-%m-%d")
-        today=dateutil.parser.parse(dateobj)
-        #print(today.date())
-        if datetime_object.date()==today.date():
-            print("hello")
+        datetime_object = datetime_object.date()
 
-
-
-if __name__ == '__main__':
-    main()
+        todayDate=(datetime.today())
+        todayDate=todayDate.strftime("%Y-%m-%d")
+        todayDate=dateutil.parser.parse(todayDate)
+        todayDate=todayDate.date()
+        if datetime_object==todayDate:
+            info.append((todayDate, startTime, endTime,event['summary']))
+    return info
+print(getInfo())
