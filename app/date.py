@@ -1,5 +1,5 @@
 from __future__ import print_function
-from datetime import datetime, date
+from datetime import datetime
 import dateutil.parser
 import pickle
 import os.path
