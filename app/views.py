@@ -1,6 +1,8 @@
 from flask import render_template
 from app import app
+from app.date import getDate
 
-@app.route('/')
+@app.route('/home')
 def default():
-    return render_template('base.html')
+    calendarData=getDate()
+    return render_template('base.html', calendar_date=calendarData)
